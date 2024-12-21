@@ -21,22 +21,22 @@ void main(List<String> args) async {
 
 class Migrate {
   registry() async {
-		 await Customers().up();
-		 await Orders().up();
-		 await Vendors().up();
-		 await Products().up();
-		 await ProductNotes().up();
-		 await OrderItems().up();
-		 await Users().up();
-	}
+    await Customers().up();
+    await Orders().up();
+    await Vendors().up();
+    await Products().up();
+    await ProductNotes().up();
+    await OrderItems().up();
+    await Users().up();
+  }
 
   dropTables() async {
-		 await Users().down();
-		 await OrderItems().down();
-		 await ProductNotes().down();
-		 await Products().down();
-		 await Vendors().down();
-		 await Orders().down();
-		 await Customers().down();
-	 }
+    await Users().down();
+    await OrderItems().down();
+    await ProductNotes().down();
+    await Products().down();
+    await Vendors().down();
+    await Orders().down();
+    await Customers().down();
+  }
 }

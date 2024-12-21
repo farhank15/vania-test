@@ -32,14 +32,12 @@ class JwtUtil {
     try {
       final strippedToken =
           token.startsWith('Bearer ') ? token.substring(7) : token;
-
       final claims = verifyJwtHS256Signature(strippedToken, _secretKey);
-
       claims.validate(issuer: _issuer);
-
       return claims;
     } catch (e) {
-      throw Exception('Token tidak valid: ${e.toString()}');
+      print('JWT verification failed: $e');
+      throw Exception('Token tidak valid');
     }
   }
 
