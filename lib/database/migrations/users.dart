@@ -7,11 +7,14 @@ class Users extends Migration {
     await createTableNotExists('users', () {
       id();
       string('name', length: 50);
-      string('email', length: 50);
-      string('password', length: 50);
+      string('username', length: 50, unique: true);
+      string('email', length: 50, unique: true);
+      string('password', length: 100);
+      timeStamp('last_login_at', nullable: true);
+      string('last_login_ip', length: 45, nullable: true);
       timeStamp('created_at', defaultValue: 'now()');
       timeStamp('updated_at', defaultValue: 'now()');
-      timeStamp('deleted_at');
+      timeStamp('deleted_at', nullable: true);
     });
   }
 
