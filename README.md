@@ -169,8 +169,8 @@ Body :
 
 ```js
 {
-  "order_date": "2024-12-21T00:00:00Z",
-  "cust_id": 1
+  "order_date": "2024-12-21",
+  "cust_id": 2
 }
 ```
 
@@ -202,8 +202,8 @@ Body :
 
 ```js
 {
-  "order_date": "2024-12-21T00:00:00Z",
-  "cust_id": 1
+  "order_date": "2024-12-21",
+  "cust_id": 2
 }
 ```
 
@@ -326,7 +326,7 @@ http://127.0.0.1:8000/api/v1/products/{id}
 
 ### Update Products
 
-Method : Put
+Method : Put`
 
 ```bash
 http://127.0.0.1:8000/api/v1/products/{id}
@@ -349,4 +349,68 @@ Method : Delete
 
 ```bash
 http://127.0.0.1:8000/api/v1/products/{id}
+```
+
+#
+
+## ===> Product_notes <===
+
+### Create Product_notes
+
+Method : Post
+
+```bash
+http://127.0.0.1:8000/api/v1/product-notes
+```
+
+Body :
+
+```js
+{
+  "prod_id": 1,
+  "note_date": "2024-12-22",
+  "note_text": "Catatan untuk produk ini."
+}
+```
+
+### Get All Product_notes
+
+Method : Get
+
+```bash
+http://127.0.0.1:8000/api/v1/product-notes
+```
+
+### Get Product_notes By Id
+
+Method : Get
+
+```bash
+http://127.0.0.1:8000/api/v1/product-notes/{id}
+```
+
+### Create Product_notes
+
+Method : Put
+
+```bash
+http://127.0.0.1:8000/api/v1/product-notes/{id}
+```
+
+Body :
+
+```js
+{
+  "prod_id": 1,
+  "note_date": "2024-12-22",
+  "note_text": "Catatan untuk produk ini."
+}
+```
+
+### Delete Product_notes
+
+Method : Delete
+
+```bash
+http://127.0.0.1:8000/api/v1/product-notes/{id}
 ```
