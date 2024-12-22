@@ -86,13 +86,15 @@ class CustomerController extends Controller {
             'Format ID tidak valid', 'ID must be a number', 400);
       }
 
-      final data = request.body;
       final existingCustomer = await _service.getCustomerById(customerId);
       if (existingCustomer == null) {
-        return ResponseUtil.createErrorResponse('Data tidak ditemukan',
-            'Customer with ID $customerId not found', 404);
+        return ResponseUtil.createErrorResponse(
+            'Data tidak ditemukan',
+            'Customer dengan ID $customerId tidak ditemukan atau sudah dihapus.',
+            404);
       }
 
+      final data = request.body;
       final customerToUpdate = Customer.fromJson({...data, 'id': customerId});
       final updatedCustomer =
           await _service.updateCustomer(customerId, customerToUpdate);
@@ -126,28 +128,25 @@ class CustomerController extends Controller {
       final existingCustomer = await _service.getCustomerById(customerId);
       if (existingCustomer == null) {
         return ResponseUtil.createErrorResponse('Data tidak ditemukan',
-            'Customer with ID $customerId not found', 404);
+            'Customer dengan ID $customerId tidak ditemukan', 404);
       }
 
-      try {
-        final deletedCustomer = await _service.deleteCustomer(customerId);
-        if (deletedCustomer == null) {
-          return ResponseUtil.createErrorResponse(
-              'Gagal menghapus data', 'Deletion failed', 400);
-        }
-
-        return ResponseUtil.createSuccessResponse(
-            'Data berhasil dihapus', deletedCustomer.toJson());
-      } on Exception catch (e) {
-        if (e.toString().contains('foreign key constraint')) {
-          return ResponseUtil.createErrorResponse(
+      final hasRelations = await _service.hasActiveRelations(customerId);
+      if (hasRelations) {
+        return ResponseUtil.createErrorResponse(
             'Gagal menghapus data',
             'Customer dengan ID $customerId memiliki relasi aktif pada tabel lain. Harap hapus relasi terlebih dahulu.',
-            409, // Conflict
-          );
-        }
-        throw e;
+            409);
       }
+
+      final deletedCustomer = await _service.deleteCustomer(customerId);
+      if (deletedCustomer == null) {
+        return ResponseUtil.createErrorResponse(
+            'Gagal menghapus data', 'Deletion failed', 400);
+      }
+
+      return ResponseUtil.createSuccessResponse(
+          'Data berhasil dihapus', deletedCustomer.toJson());
     } catch (e) {
       return ResponseUtil.createErrorResponse(
           'Gagal menghapus data pelanggan', e);

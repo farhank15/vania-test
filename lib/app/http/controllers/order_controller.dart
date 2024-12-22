@@ -34,7 +34,7 @@ class OrderController extends Controller {
       final order = await _service.getOrderById(orderId);
       if (order == null) {
         return ResponseUtil.createErrorResponse(
-            'Data tidak ditemukan', 'Order not found', 404);
+            'Data tidak ditemukan', 'not found', 404);
       }
 
       return ResponseUtil.createSuccessResponse(
@@ -69,9 +69,8 @@ class OrderController extends Controller {
       return ResponseUtil.createSuccessResponse(
           'Data berhasil dibuat', newOrder.toJson(), 201);
     } catch (e) {
-      // Tangkap pesan error dari service dan berikan respons informatif
       return ResponseUtil.createErrorResponse(
-          'Gagal membuat data', e.toString());
+          'Gagal membuat data pesanan', e.toString());
     }
   }
 
@@ -106,7 +105,8 @@ class OrderController extends Controller {
       return ResponseUtil.createSuccessResponse(
           'Data berhasil diperbarui', updatedOrder.toJson());
     } catch (e) {
-      return ResponseUtil.createErrorResponse('Gagal memperbarui data', e);
+      return ResponseUtil.createErrorResponse(
+          'Gagal memperbarui data pesanan', e.toString());
     }
   }
 

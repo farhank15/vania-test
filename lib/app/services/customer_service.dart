@@ -21,7 +21,8 @@ class CustomerService {
   Future<List<Customer>> getAllCustomers() async {
     await checkConnection();
     try {
-      final results = await _db.query('SELECT * FROM customers');
+      final results =
+          await _db.query('SELECT * FROM customers WHERE deleted_at IS NULL');
       return results.map((json) => Customer.fromJson(json)).toList();
     } catch (e) {
       throw Exception('Gagal mengambil data pelanggan: ${e.toString()}');
@@ -32,7 +33,7 @@ class CustomerService {
     await checkConnection();
     try {
       final results = await _db.query(
-        'SELECT * FROM customers WHERE id = @id',
+        'SELECT * FROM customers WHERE id = @id AND deleted_at IS NULL',
         {'id': id},
       );
       return results.isNotEmpty ? Customer.fromJson(results.first) : null;
@@ -83,6 +84,16 @@ class CustomerService {
   Future<Customer?> updateCustomer(int id, Customer customer) async {
     await checkConnection();
     try {
+      // Cek apakah data masih aktif
+      final check = await _db.query(
+        'SELECT id FROM customers WHERE id = @id AND deleted_at IS NULL',
+        {'id': id},
+      );
+      if (check.isEmpty) {
+        throw Exception(
+            'Customer dengan ID $id tidak ditemukan atau sudah dihapus.');
+      }
+
       final result = await _db.query(
         '''
       UPDATE customers 
@@ -94,7 +105,7 @@ class CustomerService {
           cust_country = @country, 
           cust_telp = @telp, 
           updated_at = now()
-      WHERE id = @id
+      WHERE id = @id AND deleted_at IS NULL
       RETURNING *
       ''',
         {
@@ -114,11 +125,33 @@ class CustomerService {
     }
   }
 
+  Future<bool> hasActiveRelations(int customerId) async {
+    await checkConnection();
+    try {
+      final result = await _db.query(
+        '''
+      SELECT COUNT(*) AS active_count 
+      FROM orders 
+      WHERE cust_id = @cust_id AND deleted_at IS NULL
+      ''',
+        {'cust_id': customerId},
+      );
+      return result.first['active_count'] > 0; // True jika ada relasi aktif
+    } catch (e) {
+      throw Exception('Gagal memeriksa relasi aktif: ${e.toString()}');
+    }
+  }
+
   Future<Customer?> deleteCustomer(int id) async {
     await checkConnection();
     try {
       final result = await _db.query(
-        'DELETE FROM ${Customer.tableName} WHERE id = @id RETURNING *',
+        '''
+      UPDATE customers 
+      SET deleted_at = now()
+      WHERE id = @id
+      RETURNING *
+      ''',
         {'id': id},
       );
       return result.isNotEmpty ? Customer.fromJson(result.first) : null;

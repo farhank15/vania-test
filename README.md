@@ -284,3 +284,69 @@ Method : Delete
 ```bash
 http://127.0.0.1:8000/api/v1/orders/{id}
 ```
+
+#
+
+## ===> Products <===
+
+### Create Products
+
+Method : Post
+
+```bash
+http://127.0.0.1:8000/api/v1/products
+```
+
+Body :
+
+```js
+{
+  "vend_id": 1,
+  "prod_name": "Produk Baru",
+  "prod_price": 100000,
+  "prod_desc": "Deskripsi produk baru"
+}
+```
+
+### Get All Products
+
+Method : Get
+
+```bash
+http://127.0.0.1:8000/api/v1/products
+```
+
+### Get Products By Id
+
+Method : Get
+
+```bash
+http://127.0.0.1:8000/api/v1/products/{id}
+```
+
+### Update Products
+
+Method : Put
+
+```bash
+http://127.0.0.1:8000/api/v1/products/{id}
+```
+
+Body :
+
+```js
+{
+  "vend_id": 1,
+  "prod_name": "Produk Baru",
+  "prod_price": 100000,
+  "prod_desc": "Deskripsi produk baru"
+}
+```
+
+### Delete Products
+
+Method : Delete
+
+```bash
+http://127.0.0.1:8000/api/v1/products/{id}
+```
