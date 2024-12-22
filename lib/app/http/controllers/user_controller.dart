@@ -41,7 +41,20 @@ class UserController extends Controller {
 
   // Helper to get IP address
   String _getIpAddress(Request request) {
-    return request.headers['X-Forwarded-For']?.split(',').first ?? 'unknown';
+    // Try to get the IP address from the X-Real-IP header
+    final ipAddress = request.headers['X-Real-IP'];
+    if (ipAddress != null && ipAddress.isNotEmpty) {
+      return ipAddress;
+    }
+
+    // If X-Real-IP is not available, try to get it from the X-Forwarded-For header
+    final forwardedFor = request.headers['X-Forwarded-For'];
+    if (forwardedFor != null && forwardedFor.isNotEmpty) {
+      return forwardedFor.split(',').first.trim();
+    }
+
+    // If neither X-Real-IP nor X-Forwarded-For is available, return "unknown"
+    return "unknown";
   }
 
   Future<User?> _getUserByIdentifier(String identifier) async {
@@ -131,21 +144,22 @@ class UserController extends Controller {
     try {
       final ipAddress = _getIpAddress(request);
 
-      // Rate limiting
       if (_rateLimiter.isLimitReached(ipAddress)) {
         return ResponseUtil.createErrorResponse(
             'Terlalu banyak percobaan login', 'Coba lagi nanti', 429);
       }
 
       final data = request.body;
+      final identifier = data['identifier']?.trim();
+      final password = data['password']?.trim();
 
-      if (!Validator.validateRequiredFields(data, ['identifier', 'password'])) {
+      if (identifier == null ||
+          password == null ||
+          identifier.isEmpty ||
+          password.isEmpty) {
         return ResponseUtil.createErrorResponse(
             'Data tidak lengkap', 'Identifier dan password wajib diisi', 400);
       }
-
-      final identifier = data['identifier'];
-      final password = data['password'];
 
       final user = await _getUserByIdentifier(identifier);
       if (user == null) {
@@ -154,30 +168,26 @@ class UserController extends Controller {
             'Login gagal', 'Identifier atau password salah', 401);
       }
 
-      // Verif password
+      // Verifikasi password
       final isPasswordValid =
           PasswordUtil.verifyPassword(password, user.password!);
-
       if (!isPasswordValid) {
         _rateLimiter.logFailedAttempt(ipAddress);
         return ResponseUtil.createErrorResponse(
             'Login gagal', 'Identifier atau password salah', 401);
       }
 
-      // Log successful login
+      // Generate tokens
+      final accessToken = JwtUtil.generateToken(user.id!,
+          expiresIn: const Duration(minutes: 15));
+      final refreshToken = JwtUtil.generateToken(user.id!,
+          expiresIn: const Duration(days: 7), isRefreshToken: true);
+
+      // Simpan refresh token ke database
+      await _service.updateUserToken(user.id!, refreshToken);
+
+      // Log login
       await _service.logLoginAttempt(user.id, ipAddress, isSuccess: true);
-
-      // Generate token JWT dan refresh token
-      final accessToken = JwtUtil.generateToken(
-        user.id!,
-        expiresIn: const Duration(minutes: 15),
-      );
-
-      final refreshToken = JwtUtil.generateToken(
-        user.id!,
-        expiresIn: const Duration(days: 7),
-        isRefreshToken: true,
-      );
 
       return ResponseUtil.createSuccessResponse('Login berhasil', {
         'access_token': accessToken,
@@ -185,6 +195,44 @@ class UserController extends Controller {
       });
     } catch (e) {
       return ResponseUtil.createErrorResponse('Gagal login', e);
+    }
+  }
+
+  Future<Response> refreshToken(Request request) async {
+    try {
+      final data = request.body;
+      final refreshToken = data['refresh_token'];
+
+      if (refreshToken == null || refreshToken.isEmpty) {
+        return ResponseUtil.createErrorResponse(
+            'Refresh token tidak valid', 'Token is required', 400);
+      }
+
+      // Verifikasi refresh token
+      final claims = JwtUtil.verifyRefreshToken(refreshToken);
+
+      // Pastikan token cocok dengan yang disimpan di database
+      final user = await _service.getUserById(int.parse(claims.subject!));
+      if (user == null || user.token != refreshToken) {
+        return ResponseUtil.createErrorResponse(
+            'Refresh token tidak valid', 'Invalid token', 401);
+      }
+
+      // Generate new tokens
+      final newAccessToken = JwtUtil.generateToken(user.id!,
+          expiresIn: const Duration(minutes: 15));
+      final newRefreshToken = JwtUtil.generateToken(user.id!,
+          expiresIn: const Duration(days: 7), isRefreshToken: true);
+
+      // Update refresh token di database
+      await _service.updateUserToken(user.id!, newRefreshToken);
+
+      return ResponseUtil.createSuccessResponse('Token berhasil diperbarui', {
+        'access_token': newAccessToken,
+        'refresh_token': newRefreshToken,
+      });
+    } catch (e) {
+      return ResponseUtil.createErrorResponse('Gagal memperbarui token', e);
     }
   }
 

@@ -31,7 +31,45 @@ class UserService {
 
   Future<void> logLoginAttempt(int? userId, String ipAddress,
       {required bool isSuccess}) async {
-    print('Login attempt: UserID=$userId, IP=$ipAddress, Success=$isSuccess');
+    await checkConnection();
+    try {
+      // Hanya update jika login berhasil
+      if (isSuccess && userId != null) {
+        await _db.query(
+          '''
+        UPDATE users
+        SET last_login_at = now(), last_login_ip = @ip_address
+        WHERE id = @user_id
+        ''',
+          {
+            'user_id': userId,
+            'ip_address': ipAddress,
+          },
+        );
+      }
+      // Jika login gagal, Anda dapat mencatat log ke sistem monitoring jika diperlukan
+    } catch (e) {
+      throw Exception('Gagal mencatat percobaan login: ${e.toString()}');
+    }
+  }
+
+  Future<void> updateUserToken(int userId, String refreshToken) async {
+    await checkConnection();
+    try {
+      await _db.query(
+        '''
+      UPDATE users
+      SET token = @token
+      WHERE id = @user_id
+      ''',
+        {
+          'user_id': userId,
+          'token': refreshToken,
+        },
+      );
+    } catch (e) {
+      throw Exception('Gagal memperbarui token pengguna: ${e.toString()}');
+    }
   }
 
   Future<User?> getUserById(int id) async {
