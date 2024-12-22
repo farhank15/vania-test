@@ -1,6 +1,52 @@
 # Documentation Rest API
 
-#
+## Table of Contents
+
+- [Authentication](#authentication)
+  - [Create Users](#create-users)
+  - [Get All Users](#get-all-users)
+  - [Get Users By Id](#get-users-by-id)
+  - [Update Users](#update-users)
+  - [Delete Users](#delete-users)
+  - [Login Users](#login-users)
+- [Customers](#customers)
+  - [Create Customers](#create-customers)
+  - [Get All Customers](#get-all-customers)
+  - [Get Customers By Id](#get-customers-by-id)
+  - [Update Customers](#update-customers)
+  - [Delete Customers](#delete-customers)
+- [Orders](#orders)
+  - [Create Orders](#create-orders)
+  - [Get All Orders](#get-all-orders)
+  - [Get Orders By Id](#get-orders-by-id)
+  - [Update Orders](#update-orders)
+  - [Delete Orders](#delete-orders)
+- [Vendors](#vendors)
+  - [Create Vendors](#create-vendors)
+  - [Get All Vendors](#get-all-vendors)
+  - [Get Vendors By Id](#get-vendors-by-id)
+  - [Update Vendors](#update-vendors)
+  - [Delete Vendors](#delete-vendors)
+- [Products](#products)
+  - [Create Products](#create-products)
+  - [Get All Products](#get-all-products)
+  - [Get Products By Id](#get-products-by-id)
+  - [Update Products](#update-products)
+  - [Delete Products](#delete-products)
+- [Product Notes](#product-notes)
+  - [Create Product Notes](#create-product-notes)
+  - [Get All Product Notes](#get-all-product-notes)
+  - [Get Product Notes By Id](#get-product-notes-by-id)
+  - [Update Product Notes](#update-product-notes)
+  - [Delete Product Notes](#delete-product-notes)
+- [Order Items](#order-items)
+  - [Create Order Items](#create-order-items)
+  - [Get All Order Items](#get-all-order-items)
+  - [Get Order Items By Id](#get-order-items-by-id)
+  - [Update Order Items](#update-order-items)
+  - [Delete Order Items](#delete-order-items)
+
+---
 
 ## ===> Authentication <===
 
@@ -81,7 +127,7 @@ http://127.0.0.1:8000/api/v1/users/login
 }
 ```
 
-#
+---
 
 ## ===> Customers <===
 
@@ -153,7 +199,7 @@ Method : Delete
 http://127.0.0.1:8000/api/v1/customers/{id}
 ```
 
-#
+---
 
 ## ===> Orders <===
 
@@ -215,7 +261,7 @@ Method : Delete
 http://127.0.0.1:8000/api/v1/orders/{id}
 ```
 
-#
+---
 
 ## ===> Vendors <===
 
@@ -285,7 +331,7 @@ Method : Delete
 http://127.0.0.1:8000/api/v1/orders/{id}
 ```
 
-#
+---
 
 ## ===> Products <===
 
@@ -351,7 +397,7 @@ Method : Delete
 http://127.0.0.1:8000/api/v1/products/{id}
 ```
 
-#
+---
 
 ## ===> Product_notes <===
 
@@ -413,4 +459,70 @@ Method : Delete
 
 ```bash
 http://127.0.0.1:8000/api/v1/product-notes/{id}
+```
+
+---
+
+## ===> Order_items <===
+
+### Create Order_items
+
+Method : Post
+
+```bash
+http://127.0.0.1:8000/api/v1/order-items
+```
+
+Body :
+
+```js
+{
+  "order_id": 1,
+  "prod_id": 1,
+  "quantity": 12,
+  "size": 3
+}
+```
+
+### Get All Order_items
+
+Method : Get
+
+```bash
+http://127.0.0.1:8000/api/v1/order-items
+```
+
+### Get Order_items By Id
+
+Method : Get
+
+```bash
+http://127.0.0.1:8000/api/v1/order-items/{id}
+```
+
+### Update Order_items
+
+Method : Put
+
+```bash
+http://127.0.0.1:8000/api/v1/order-items/{id}
+```
+
+Body :
+
+```js
+{
+  "order_id": 1,
+  "prod_id": 1,
+  "quantity": 12,
+  "size": 3
+}
+```
+
+### Delete Order_items
+
+Method : Delete
+
+```bash
+http://127.0.0.1:8000/api/v1/order-items/{id}
 ```

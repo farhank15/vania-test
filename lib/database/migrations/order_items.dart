@@ -14,7 +14,7 @@ class OrderItems extends Migration {
       foreign('order_id', 'orders', 'id');
       timeStamp('created_at', defaultValue: 'now()');
       timeStamp('updated_at', defaultValue: 'now()');
-      timeStamp('deleted_at');
+      timeStamp('deleted_at', nullable: true);
     });
   }
 
