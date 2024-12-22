@@ -122,8 +122,8 @@ http://127.0.0.1:8000/api/v1/users/login
 
 ```js
 {
-  "identifier":"John2", // email or username
-  "password": "@Password123",
+  "identifier":"JohnDoe", // email or username
+  "password": "@Password123"
 }
 ```
 
