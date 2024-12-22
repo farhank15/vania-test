@@ -44,6 +44,17 @@ class OrderService {
   Future<Order?> createOrder(Order order) async {
     await checkConnection();
     try {
+      // Periksa apakah cust_id aktif
+      final customer = await _db.query(
+        'SELECT id FROM customers WHERE id = @cust_id AND deleted_at IS NULL',
+        {'cust_id': order.custId},
+      );
+      if (customer.isEmpty) {
+        throw Exception(
+            'Pelanggan dengan ID ${order.custId} tidak ditemukan atau sudah tidak aktif.');
+      }
+
+      // Lanjutkan pembuatan order jika validasi berhasil
       final result = await _db.query(
         '''
       INSERT INTO orders (order_date, cust_id) 
@@ -57,7 +68,6 @@ class OrderService {
       );
       return result.isNotEmpty ? Order.fromJson(result.first) : null;
     } catch (e) {
-      // Tangkap error foreign key
       if (e.toString().contains('23503')) {
         throw Exception('Pelanggan dengan ID ${order.custId} tidak ditemukan.');
       }
@@ -71,11 +81,23 @@ class OrderService {
       final updates = <String, dynamic>{};
       final setClauses = <String>[];
 
+      // Validasi dan tambahkan order_date jika ada
       if (order.orderDate != null) {
         updates['order_date'] = order.orderDate?.toIso8601String();
         setClauses.add('order_date = @order_date');
       }
+
+      // Validasi dan tambahkan cust_id jika ada
       if (order.custId != null) {
+        // Periksa apakah cust_id aktif
+        final customer = await _db.query(
+          'SELECT id FROM customers WHERE id = @cust_id AND deleted_at IS NULL',
+          {'cust_id': order.custId},
+        );
+        if (customer.isEmpty) {
+          throw Exception(
+              'Pelanggan dengan ID ${order.custId} tidak ditemukan atau sudah tidak aktif.');
+        }
         updates['cust_id'] = order.custId;
         setClauses.add('cust_id = @cust_id');
       }
@@ -89,11 +111,11 @@ class OrderService {
 
       final result = await _db.query(
         '''
-        UPDATE orders 
-        SET ${setClauses.join(', ')}
-        WHERE id = @id AND deleted_at IS NULL
-        RETURNING *
-        ''',
+      UPDATE orders 
+      SET ${setClauses.join(', ')}
+      WHERE id = @id AND deleted_at IS NULL
+      RETURNING *
+      ''',
         updates,
       );
       return result.isNotEmpty ? Order.fromJson(result.first) : null;

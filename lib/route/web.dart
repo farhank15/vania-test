@@ -1,3 +1,4 @@
+import 'package:backend/app/http/controllers/product_controller.dart';
 import 'package:vania/vania.dart';
 import '../app/http/controllers/customer_controller.dart';
 import '../app/http/controllers/user_controller.dart';
@@ -11,6 +12,7 @@ class WebRoute implements Route {
     final userController = UserController();
     final orderController = OrderController();
     final vendorController = VendorController();
+    final controller = ProductController();
 
     // Prefix API
     const String apiPrefix = '/api/v1';
@@ -43,5 +45,12 @@ class WebRoute implements Route {
     Router.post('$apiPrefix/vendors', vendorController.store);
     Router.put('$apiPrefix/vendors/{id}', vendorController.update);
     Router.delete('$apiPrefix/vendors/{id}', vendorController.destroy);
+
+    // Product routes
+    Router.get('$apiPrefix/products', controller.index);
+    Router.get('$apiPrefix/products/{id}', controller.show);
+    Router.post('$apiPrefix/products', controller.store);
+    Router.put('$apiPrefix/products/{id}', controller.update);
+    Router.delete('$apiPrefix/products/{id}', controller.destroy);
   }
 }
