@@ -64,7 +64,6 @@ class CustomerService {
 
       if (result.isNotEmpty) {
         final data = result.first;
-        // Parsing atribut waktu secara eksplisit
         data['created_at'] = data['created_at'] != null
             ? DateTime.parse(data['created_at'].toString())
             : null;
