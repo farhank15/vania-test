@@ -192,7 +192,7 @@ http://127.0.0.1:8000/api/v1/orders/{id}
 
 ### Update Orders
 
-Method : Update
+Method : Put
 
 ```bash
 http://127.0.0.1:8000/api/v1/orders{id}
@@ -208,6 +208,76 @@ Body :
 ```
 
 ### Delete Orders
+
+Method : Delete
+
+```bash
+http://127.0.0.1:8000/api/v1/orders/{id}
+```
+
+#
+
+## ===> Vendors <===
+
+### Create Vendors
+
+Method : Post
+
+```bash
+http://127.0.0.1:8000/api/v1/vendors
+```
+
+Body :
+
+```js
+{
+  "vend_name": "Vendor ABC",
+  "vend_address": "Jl. Raya No. 123",
+  "vend_kota": "Jakarta",
+  "vend_state": "JKT",
+  "vend_zip": "12345",
+  "vend_country": "Indonesia"
+}
+```
+
+### Get All Vendors
+
+Method : Get
+
+```bash
+http://127.0.0.1:8000/api/v1/vendors
+```
+
+### Get Vendors By Id
+
+Method : Get
+
+```bash
+http://127.0.0.1:8000/api/v1/orders/{id}
+```
+
+### Update Vendors
+
+Method : Put
+
+```bash
+http://127.0.0.1:8000/api/v1/vendors/{id}
+```
+
+Body :
+
+```js
+{
+  "vend_name": "Vendor XYZ",
+  "vend_address": "Jl. Baru No. 456",
+  "vend_kota": "Bandung",
+  "vend_state": "BDG",
+  "vend_zip": "67890",
+  "vend_country": "Indonesia"
+}
+```
+
+### Delete Vendors
 
 Method : Delete
 

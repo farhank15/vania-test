@@ -10,10 +10,10 @@ class Products extends Migration {
       string('prod_name', length: 25);
       integer('prod_price', length: 11);
       text('prod_desc');
-      foreign('vend_id', 'vendors', 'id');
       timeStamp('created_at', defaultValue: 'now()');
       timeStamp('updated_at', defaultValue: 'now()');
       timeStamp('deleted_at', nullable: true);
+      foreign('vend_id', 'vendors', 'id');
     });
   }
 
