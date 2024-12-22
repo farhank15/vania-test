@@ -13,7 +13,7 @@ class Products extends Migration {
       foreign('vend_id', 'vendors', 'id');
       timeStamp('created_at', defaultValue: 'now()');
       timeStamp('updated_at', defaultValue: 'now()');
-      timeStamp('deleted_at');
+      timeStamp('deleted_at', nullable: true);
     });
   }
 

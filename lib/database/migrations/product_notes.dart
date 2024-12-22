@@ -13,7 +13,7 @@ class ProductNotes extends Migration {
       foreign('prod_id', 'products', 'id');
       timeStamp('created_at', defaultValue: 'now()');
       timeStamp('updated_at', defaultValue: 'now()');
-      timeStamp('deleted_at');
+      timeStamp('deleted_at', nullable: true);
     });
   }
 
