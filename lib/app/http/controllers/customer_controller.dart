@@ -109,7 +109,7 @@ class CustomerController extends Controller {
     }
   }
 
-  // DELETE /customers/:id - Delete customer by ID
+// DELETE /customers/:id - Delete customer by ID
   Future<Response> destroy(Request request, dynamic id) async {
     try {
       if (id == null) {
@@ -129,16 +129,28 @@ class CustomerController extends Controller {
             'Customer with ID $customerId not found', 404);
       }
 
-      final deletedCustomer = await _service.deleteCustomer(customerId);
-      if (deletedCustomer == null) {
-        return ResponseUtil.createErrorResponse(
-            'Gagal menghapus data', 'Deletion failed', 400);
-      }
+      try {
+        final deletedCustomer = await _service.deleteCustomer(customerId);
+        if (deletedCustomer == null) {
+          return ResponseUtil.createErrorResponse(
+              'Gagal menghapus data', 'Deletion failed', 400);
+        }
 
-      return ResponseUtil.createSuccessResponse(
-          'Data berhasil dihapus', deletedCustomer.toJson());
+        return ResponseUtil.createSuccessResponse(
+            'Data berhasil dihapus', deletedCustomer.toJson());
+      } on Exception catch (e) {
+        if (e.toString().contains('foreign key constraint')) {
+          return ResponseUtil.createErrorResponse(
+            'Gagal menghapus data',
+            'Customer dengan ID $customerId memiliki relasi aktif pada tabel lain. Harap hapus relasi terlebih dahulu.',
+            409, // Conflict
+          );
+        }
+        throw e;
+      }
     } catch (e) {
-      return ResponseUtil.createErrorResponse('Gagal menghapus data', e);
+      return ResponseUtil.createErrorResponse(
+          'Gagal menghapus data pelanggan', e);
     }
   }
 }

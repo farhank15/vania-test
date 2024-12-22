@@ -2,6 +2,7 @@ import 'package:vania/vania.dart';
 import '../app/http/controllers/customer_controller.dart';
 import '../app/http/controllers/user_controller.dart';
 import '../app/http/controllers/order_controller.dart';
+import '../app/http/controllers/vendor_controller.dart';
 
 class WebRoute implements Route {
   @override
@@ -9,6 +10,7 @@ class WebRoute implements Route {
     final customerController = CustomerController();
     final userController = UserController();
     final orderController = OrderController();
+    final vendorController = VendorController();
 
     // Prefix API
     const String apiPrefix = '/api/v1';
@@ -34,5 +36,12 @@ class WebRoute implements Route {
     Router.post('$apiPrefix/orders', orderController.store);
     Router.put('$apiPrefix/orders/{id}', orderController.update);
     Router.delete('$apiPrefix/orders/{id}', orderController.destroy);
+
+    // vendor routes
+    Router.get('$apiPrefix/vendors', vendorController.index);
+    Router.get('$apiPrefix/vendors/{id}', vendorController.show);
+    Router.post('$apiPrefix/vendors', vendorController.store);
+    Router.put('$apiPrefix/vendors/{id}', vendorController.update);
+    Router.delete('$apiPrefix/vendors/{id}', vendorController.destroy);
   }
 }

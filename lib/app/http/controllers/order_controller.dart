@@ -13,8 +13,7 @@ class OrderController extends Controller {
       return ResponseUtil.createSuccessResponse(
           'Data berhasil diambil', orders.map((o) => o.toJson()).toList());
     } catch (e) {
-      return ResponseUtil.createErrorResponse(
-          'Gagal mengambil data pesanan', e);
+      return ResponseUtil.createErrorResponse('Gagal mengambil data', e);
     }
   }
 
@@ -41,8 +40,7 @@ class OrderController extends Controller {
       return ResponseUtil.createSuccessResponse(
           'Data berhasil ditemukan', order.toJson());
     } catch (e) {
-      return ResponseUtil.createErrorResponse(
-          'Gagal mengambil data pesanan', e);
+      return ResponseUtil.createErrorResponse('Gagal mengambil data', e);
     }
   }
 
@@ -64,16 +62,16 @@ class OrderController extends Controller {
 
       final newOrder = await _service.createOrder(order);
       if (newOrder == null) {
-        return ResponseUtil.createErrorResponse('Gagal membuat data pesanan',
-            'Terjadi kesalahan saat menyimpan data', 500);
+        return ResponseUtil.createErrorResponse(
+            'Gagal membuat data', 'Terjadi kesalahan saat menyimpan data', 500);
       }
 
       return ResponseUtil.createSuccessResponse(
-          'Data pesanan berhasil dibuat', newOrder.toJson(), 201);
+          'Data berhasil dibuat', newOrder.toJson(), 201);
     } catch (e) {
       // Tangkap pesan error dari service dan berikan respons informatif
       return ResponseUtil.createErrorResponse(
-          'Gagal membuat data pesanan', e.toString());
+          'Gagal membuat data', e.toString());
     }
   }
 
@@ -102,14 +100,13 @@ class OrderController extends Controller {
       final updatedOrder = await _service.updateOrder(orderId, order);
       if (updatedOrder == null) {
         return ResponseUtil.createErrorResponse(
-            'Gagal memperbarui data pesanan', 'Update failed', 400);
+            'Gagal memperbarui data', 'Update failed', 400);
       }
 
       return ResponseUtil.createSuccessResponse(
-          'Data pesanan berhasil diperbarui', updatedOrder.toJson());
+          'Data berhasil diperbarui', updatedOrder.toJson());
     } catch (e) {
-      return ResponseUtil.createErrorResponse(
-          'Gagal memperbarui data pesanan', e);
+      return ResponseUtil.createErrorResponse('Gagal memperbarui data', e);
     }
   }
 
@@ -130,14 +127,13 @@ class OrderController extends Controller {
       final deletedOrder = await _service.deleteOrder(orderId);
       if (deletedOrder == null) {
         return ResponseUtil.createErrorResponse(
-            'Gagal menghapus data pesanan', 'Deletion failed', 400);
+            'Gagal menghapus data', 'Deletion failed', 400);
       }
 
       return ResponseUtil.createSuccessResponse(
-          'Data pesanan berhasil dihapus', deletedOrder.toJson());
+          'Data berhasil dihapus', deletedOrder.toJson());
     } catch (e) {
-      return ResponseUtil.createErrorResponse(
-          'Gagal menghapus data pesanan', e);
+      return ResponseUtil.createErrorResponse('Gagal menghapus data', e);
     }
   }
 }
