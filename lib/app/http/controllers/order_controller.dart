@@ -55,8 +55,18 @@ class OrderController extends Controller {
             'Validasi gagal', 'Field order_date dan cust_id wajib diisi', 400);
       }
 
+      // Validasi format tanggal
+      final regex = RegExp(r'^\d{4}-\d{2}-\d{2}$'); // Format YYYY-MM-DD
+      if (!regex.hasMatch(data['order_date'])) {
+        return ResponseUtil.createErrorResponse(
+            'Validasi gagal',
+            'Field order_date harus berupa format tanggal yang valid (YYYY-MM-DD)',
+            400);
+      }
+
+      // Buat objek Order langsung dengan String untuk orderDate
       final order = Order(
-        orderDate: DateTime.tryParse(data['order_date']),
+        orderDate: data['order_date'], // Tidak perlu konversi DateTime
         custId: data['cust_id'],
       );
 
@@ -89,10 +99,20 @@ class OrderController extends Controller {
       }
 
       final data = request.body;
+
+      // Validasi format tanggal jika ada
+      if (data['order_date'] != null) {
+        final regex = RegExp(r'^\d{4}-\d{2}-\d{2}$');
+        if (!regex.hasMatch(data['order_date'])) {
+          return ResponseUtil.createErrorResponse(
+              'Validasi gagal',
+              'Field order_date harus berupa format tanggal yang valid (YYYY-MM-DD)',
+              400);
+        }
+      }
+
       final order = Order(
-        orderDate: data['order_date'] != null
-            ? DateTime.tryParse(data['order_date'])
-            : null,
+        orderDate: data['order_date'], // Langsung gunakan string
         custId: data['cust_id'],
       );
 

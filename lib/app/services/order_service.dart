@@ -44,17 +44,6 @@ class OrderService {
   Future<Order?> createOrder(Order order) async {
     await checkConnection();
     try {
-      // Periksa apakah cust_id aktif
-      final customer = await _db.query(
-        'SELECT id FROM customers WHERE id = @cust_id AND deleted_at IS NULL',
-        {'cust_id': order.custId},
-      );
-      if (customer.isEmpty) {
-        throw Exception(
-            'Pelanggan dengan ID ${order.custId} tidak ditemukan atau sudah tidak aktif.');
-      }
-
-      // Lanjutkan pembuatan order jika validasi berhasil
       final result = await _db.query(
         '''
       INSERT INTO orders (order_date, cust_id) 
@@ -62,7 +51,7 @@ class OrderService {
       RETURNING *
       ''',
         {
-          'order_date': order.orderDate?.toIso8601String(),
+          'order_date': order.orderDate, // Tetap gunakan String
           'cust_id': order.custId,
         },
       );
@@ -81,9 +70,8 @@ class OrderService {
       final updates = <String, dynamic>{};
       final setClauses = <String>[];
 
-      // Validasi dan tambahkan order_date jika ada
       if (order.orderDate != null) {
-        updates['order_date'] = order.orderDate?.toIso8601String();
+        updates['order_date'] = order.orderDate;
         setClauses.add('order_date = @order_date');
       }
 
