@@ -152,3 +152,65 @@ Method : Delete
 ```bash
 http://127.0.0.1:8000/api/v1/customers/{id}
 ```
+
+#
+
+## ===> Orders <===
+
+### Create Orders
+
+Method : Post
+
+```bash
+http://127.0.0.1:8000/api/v1/orders
+```
+
+Body :
+
+```js
+{
+  "order_date": "2024-12-21T00:00:00Z",
+  "cust_id": 1
+}
+```
+
+### Get All Orders
+
+Method : Get
+
+```bash
+http://127.0.0.1:8000/api/v1/orders
+```
+
+### Get Orders By Id
+
+Method : Get
+
+```bash
+http://127.0.0.1:8000/api/v1/orders/{id}
+```
+
+### Update Orders
+
+Method : Update
+
+```bash
+http://127.0.0.1:8000/api/v1/orders{id}
+```
+
+Body :
+
+```js
+{
+  "order_date": "2024-12-21T00:00:00Z",
+  "cust_id": 1
+}
+```
+
+### Delete Orders
+
+Method : Delete
+
+```bash
+http://127.0.0.1:8000/api/v1/orders/{id}
+```
