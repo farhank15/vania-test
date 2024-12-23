@@ -10,7 +10,7 @@ class Users extends Migration {
       string('username', length: 50, unique: true);
       string('email', length: 50, unique: true);
       string('password', length: 100);
-      string('token', length: 255, unique: true, nullable: true);
+      string('token', length: 500, unique: true, nullable: true);
       timeStamp('last_login_at', nullable: true);
       string('last_login_ip', length: 45, nullable: true);
       timeStamp('created_at', defaultValue: 'now()');

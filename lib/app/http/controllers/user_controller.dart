@@ -35,25 +35,19 @@ class RateLimiter {
 
 class UserController extends Controller {
   final UserService _service = UserService();
-
-  // Middleware to enforce rate limiting
   final RateLimiter _rateLimiter = RateLimiter();
 
-  // Helper to get IP address
   String _getIpAddress(Request request) {
-    // Try to get the IP address from the X-Real-IP header
     final ipAddress = request.headers['X-Real-IP'];
     if (ipAddress != null && ipAddress.isNotEmpty) {
       return ipAddress;
     }
 
-    // If X-Real-IP is not available, try to get it from the X-Forwarded-For header
     final forwardedFor = request.headers['X-Forwarded-For'];
     if (forwardedFor != null && forwardedFor.isNotEmpty) {
       return forwardedFor.split(',').first.trim();
     }
 
-    // If neither X-Real-IP nor X-Forwarded-For is available, return "unknown"
     return "unknown";
   }
 
@@ -65,7 +59,6 @@ class UserController extends Controller {
     }
   }
 
-  // GET /users - Get all users
   Future<Response> index() async {
     try {
       final users = await _service.getAllUsers();
@@ -76,7 +69,6 @@ class UserController extends Controller {
     }
   }
 
-  // GET /users/:id - Get user by ID
   Future<Response> show(Request request, dynamic id) async {
     try {
       if (id == null) {
@@ -103,12 +95,10 @@ class UserController extends Controller {
     }
   }
 
-  // POST /users - Create new user
   Future<Response> store(Request request) async {
     try {
       final data = request.body;
 
-      // Validasi input
       final validationErrors = UserValidator.validateUserCreate(data);
       if (validationErrors.isNotEmpty) {
         return ResponseUtil.createErrorResponse(
@@ -128,7 +118,6 @@ class UserController extends Controller {
             'Terjadi kesalahan saat menyimpan data', 500);
       }
 
-      // Hapus password dari response
       final responseData = newUser.toJson();
       responseData.remove('password');
 
@@ -139,7 +128,6 @@ class UserController extends Controller {
     }
   }
 
-  // POST /users/login - User login
   Future<Response> login(Request request) async {
     try {
       final ipAddress = _getIpAddress(request);
@@ -168,7 +156,6 @@ class UserController extends Controller {
             'Login gagal', 'Identifier atau password salah', 401);
       }
 
-      // Verifikasi password
       final isPasswordValid =
           PasswordUtil.verifyPassword(password, user.password!);
       if (!isPasswordValid) {
@@ -177,17 +164,24 @@ class UserController extends Controller {
             'Login gagal', 'Identifier atau password salah', 401);
       }
 
-      // Generate tokens
-      final accessToken = JwtUtil.generateToken(user.id!,
-          expiresIn: const Duration(minutes: 15));
-      final refreshToken = JwtUtil.generateToken(user.id!,
-          expiresIn: const Duration(days: 7), isRefreshToken: true);
+      // Generate tokens with required parameters
+      final accessToken = JwtUtil.generateToken(
+        userId: user.id!,
+        name: user.name!,
+        email: user.email!,
+        expiresIn: const Duration(minutes: 15),
+      );
 
-      // Simpan refresh token ke database
+      final refreshToken = JwtUtil.generateToken(
+        userId: user.id!,
+        name: user.name!,
+        email: user.email!,
+        isRefreshToken: true,
+        expiresIn: const Duration(days: 7),
+      );
+
       await _service.updateUserToken(user.id!, refreshToken);
-
-      // Log login
-      await _service.logLoginAttempt(user.id, ipAddress, isSuccess: true);
+      await _service.logLoginAttempt(user.id!, ipAddress, isSuccess: true);
 
       return ResponseUtil.createSuccessResponse('Login berhasil', {
         'access_token': accessToken,
@@ -208,23 +202,30 @@ class UserController extends Controller {
             'Refresh token tidak valid', 'Token is required', 400);
       }
 
-      // Verifikasi refresh token
       final claims = JwtUtil.verifyRefreshToken(refreshToken);
+      final userId = int.parse(claims.subject!);
 
-      // Pastikan token cocok dengan yang disimpan di database
-      final user = await _service.getUserById(int.parse(claims.subject!));
+      final user = await _service.getUserById(userId);
       if (user == null || user.token != refreshToken) {
         return ResponseUtil.createErrorResponse(
             'Refresh token tidak valid', 'Invalid token', 401);
       }
 
-      // Generate new tokens
-      final newAccessToken = JwtUtil.generateToken(user.id!,
-          expiresIn: const Duration(minutes: 15));
-      final newRefreshToken = JwtUtil.generateToken(user.id!,
-          expiresIn: const Duration(days: 7), isRefreshToken: true);
+      final newAccessToken = JwtUtil.generateToken(
+        userId: user.id!,
+        name: user.name!,
+        email: user.email!,
+        expiresIn: const Duration(minutes: 15),
+      );
 
-      // Update refresh token di database
+      final newRefreshToken = JwtUtil.generateToken(
+        userId: user.id!,
+        name: user.name!,
+        email: user.email!,
+        isRefreshToken: true,
+        expiresIn: const Duration(days: 7),
+      );
+
       await _service.updateUserToken(user.id!, newRefreshToken);
 
       return ResponseUtil.createSuccessResponse('Token berhasil diperbarui', {
@@ -236,7 +237,6 @@ class UserController extends Controller {
     }
   }
 
-  // PUT /users/:id - Update user by ID
   Future<Response> update(Request request, dynamic id) async {
     try {
       if (id == null) {
@@ -252,14 +252,12 @@ class UserController extends Controller {
 
       final data = request.body;
 
-      // Validate update data
       final validationErrors = UserValidator.validateUserUpdate(data);
       if (validationErrors.isNotEmpty) {
         return ResponseUtil.createErrorResponse(
             'Validasi gagal', validationErrors, 400);
       }
 
-      // Optional: Hash password if provided
       if (data.containsKey('password') && data['password'] != null) {
         data['password'] = PasswordUtil.hashPassword(data['password']);
       }
@@ -277,7 +275,6 @@ class UserController extends Controller {
             'Gagal memperbarui data pengguna', 'Update failed', 400);
       }
 
-      // Remove password from response
       final responseData = updatedUser.toJson();
       responseData.remove('password');
 
@@ -288,7 +285,6 @@ class UserController extends Controller {
     }
   }
 
-  // DELETE /users/:id - Delete user by ID
   Future<Response> destroy(Request request, dynamic id) async {
     try {
       if (id == null) {
